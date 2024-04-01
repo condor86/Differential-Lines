@@ -6,11 +6,9 @@ float r1 = 50;
 float kmax = 1.2;
 float kmin = 0.4;
 float dAv;
-
+int nmin = 0;
 
 ArrayList<Pt> pts = new ArrayList<>();
-
-//Pt[] pts = new Pt[ptnum];
 
 class Pt{
     float ptx;
@@ -37,19 +35,19 @@ class Pt{
         ptyadd += random(-randomspeed, randomspeed);
     }
 
-    void attrmotion(){
+    void attrmotion(int ptindex){
         int fnum;
         PVector fav, fadd;
         fav = new PVector (0, 0);
         fadd = new PVector (0, 0);
         fnum = 0;
-        for(int a = 0; a < ptnum; a++){
-            if  ((ptx != pts.get(a).x()) && (pty != pts.get(a).y()) && (ptx != pts.get((a+1) % ptnum).x()) && (pty != pts.get((a+1) % ptnum).y())) {
-                fadd = force(ptx, pty, pts.get(a).x(), pts.get(a).y(), pts.get((a+1) % ptnum).x(), pts.get((a+1) % ptnum).y());
+        for (int j = 0; j < ptnum; j++){
+            if ((j > ptindex + nmin) || (((j + 1) % ptnum) < (ptindex - nmin))){
+                fadd = force(ptx, pty, pts.get(j).x(), pts.get(j).y(), pts.get((j+1) % ptnum).x(), pts.get((j+1) % ptnum).y());
                 fav = fav.add(fadd);
                 if (fadd.mag() > 0.1){
                     fnum++;
-                }              
+                }
             }
         }
         if (fnum == 0){
@@ -95,8 +93,6 @@ void display(int i){
 }
 
 PVector force(float ptx1, float pty1, float ptx2, float pty2, float ptx3, float pty3){
-    // Pt lspt = ln.spt();
-    // Pt lept = ln.ept();
     PVector v1, v2, v3;
     PVector f;
     PVector zerovect;
@@ -177,24 +173,18 @@ void setup(){
         
         ptsin = new Pt(width/2 + initialR * cos(2 * PI / ptnum * i), height/2 + initialR * sin(2 * PI / ptnum * i));
         pts.add(ptsin);
-        //if (i<ptnum - 1){
-            //lns[i] = new LnSegment(pts[i], pts[i+1]);
-        //}else{
-            //lns[i] = new LnSegment(pts[i], pts[0]);
-        //}
     }
 }
 
 
-void draw(){ //<>//
-  background(255);   //<>// //<>// //<>//
+void draw(){
+  background(255); 
   for (int i=0; i<ptnum; i++){
         display(i);
         pts.get(i).brmotion();
-        pts.get(i).attrmotion();
+        pts.get(i).attrmotion(i);
         pts.get(i).move();
         pts.get(i).boundarydetect();
-//        lns[i].addpt();
         dAv = caldAv();
         addpt();
         delpt();
